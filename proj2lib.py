@@ -235,12 +235,3 @@ class Protein:
 					continue
 		#Return E when done.
 		return E
-
-
-
-protein = Protein(20)
-protein.twist(6,1)
-protein.twist(13,0)
-protein.twist(11,1)
-protein.G.draw()
-print(protein.calculateEnergy())
