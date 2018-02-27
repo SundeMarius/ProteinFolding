@@ -2,6 +2,21 @@ import numpy as np
 import random
 
 
+def weakBinding():
+	return random.uniform(-10.4e-21,-3.47e-21)
+
+def kronDelta(i,j):
+	"""
+	:param i: Monom number i
+	:param j: Monom number j
+	:return: 0 if i and j is subsequential, 1 otherwise
+	"""
+	if (abs(i-j) > 1):
+		return 1
+	else:
+		return 0
+
+
 class Grid:
 
 	def __init__(self, gridSize):
@@ -181,11 +196,23 @@ class Protein:
 		return self.G
 
 	#Energy
-	def nearestNeighbours(self, x, y):
+	def calculateEnergy(self):
+		"""
+		:return: #returns total energy E in the grid
+		"""
+		E = 0
+		#Iterate over the whole grid
+		for i in range(1,self.G.gSize+1):
+			#find monom i
+			pos = self.G.findElement(i)
+			#Search for potentially 2 extra neighbours
+			for j in range(1, self.G.gSize + 1):
+				if j == i or j == i-1 or j == i+1:
+					continue
+				else:
+					E += kronDelta(j, i)*weakBinding()
 
 
-def weakBinding():
-	return random.uniform(-10.4e-21,-3.47e-21)
 
 protein = Protein(15)
 protein.G.draw()
