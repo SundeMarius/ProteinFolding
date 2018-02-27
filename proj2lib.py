@@ -57,6 +57,8 @@ class Protein:
 		print("\n\n### ERROR ###\nfunction searchAdjacent cannot find target number next to initial number\n\n")
 		return np.array([0, 0])
 
+	def nearestNeighbours(self,x,y):
+
 	def counterClockwiseTransformation(self, reducedCoords):
 		'''
 
@@ -179,4 +181,6 @@ class Protein:
 					self.G.grid[currentCoords[0], currentCoords[1]], self.G.grid[endCoords[0]][endCoords[1]]
 
 		return self.G
+
+
 
