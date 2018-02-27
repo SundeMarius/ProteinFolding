@@ -57,8 +57,6 @@ class Protein:
 		print("\n\n### ERROR ###\nfunction searchAdjacent cannot find target number next to initial number\n\n")
 		return np.array([0, 0])
 
-	def nearestNeighbours(self,x,y):
-
 	def counterClockwiseTransformation(self, reducedCoords):
 		'''
 
@@ -182,5 +180,13 @@ class Protein:
 
 		return self.G
 
+	#Energy
+	def nearestNeighbours(self, x, y):
 
 
+def weakBinding():
+	return random.uniform(-10.4e-21,-3.47e-21)
+
+protein = Protein(15)
+protein.G.draw()
+print(protein.G.findElement(4))
