@@ -11,10 +11,10 @@ def kronDelta(i,j):
 	:param j: Monom number j
 	:return: 0 if i and j is subsequential, 1 otherwise
 	"""
-	if (abs(i-j) > 1):
-		return 1
-	else:
+	if (abs(i-j) <= 1):
 		return 0
+	else:
+		return 1
 
 
 class Grid:
@@ -72,35 +72,23 @@ class Protein:
 		print("\n\n### ERROR ###\nfunction searchAdjacent cannot find target number next to initial number\n\n")
 		return np.array([0, 0])
 
-	def isAdjacent(self,pivotCoords,side):
+	def revealAdjacent(self,pivotCoords,side):
 		"""
 		:param pivotCoords: coordinates of the monom of interest
 		:param side: 'Over' is y+1, 'Below' is y-1, 'Left' is x-1, 'Right' is x+1
-		:return: 1 if there is a monom-neighbour of interest, 0 else
+		:return: the potential monom on the side of interest
 		"""
 		x = pivotCoords[0]
 		y = pivotCoords[1]
 
 		if side == 'Over':
-			if self.G.grid[x,y+1] != 0:
-				return 1
-			else:
-				return 0
+			return self.G.grid[x][y+1]
 		elif side == 'Below':
-			if self.G.grid[x,y-1] != 0:
-				return 1
-			else:
-				return 0
+			return self.G.grid[x][y-1]
 		elif side == 'Left':
-			if self.G.grid[x-1,y] != 0:
-				return 1
-			else:
-				return 0
+			return self.G.grid[x-1][y]
 		elif side == 'Right':
-			if self.G.grid[x+1,y] != 0:
-				return 1
-			else:
-				return 0
+			return self.G.grid[x+1][y]
 		else:
 			print("**ERROR** enter a valid side.")
 
@@ -239,17 +227,20 @@ class Protein:
 			#find monom i
 			pos = self.G.findElement(i)
 			#Search for extra neighbours, add energy-contribution if there is
-			for j in range(1, self.n + 1):
-				if j==i or j==i-1 or j==i+1:
-					continue
+			for k in Sides:
+				j = self.revealAdjacent(pos, k)
+				if j!=0:
+					E += weakBinding() * kronDelta(i,j)
 				else:
-					for k in Sides:
-						n = self.isAdjacent(pos,k)
-						E += weakBinding()*n
+					continue
+		#Return E when done.
 		return E
 
 
 
-protein = Protein(100)
+protein = Protein(20)
+protein.twist(6,1)
+protein.twist(13,0)
+protein.twist(11,1)
 protein.G.draw()
 print(protein.calculateEnergy())
