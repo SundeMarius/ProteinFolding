@@ -72,6 +72,38 @@ class Protein:
 		print("\n\n### ERROR ###\nfunction searchAdjacent cannot find target number next to initial number\n\n")
 		return np.array([0, 0])
 
+	def isAdjacent(self,pivotCoords,side):
+		"""
+		:param pivotCoords: coordinates of the monom of interest
+		:param side: 'Over' is y+1, 'Below' is y-1, 'Left' is x-1, 'Right' is x+1
+		:return: 1 if there is a monom-neighbour of interest, 0 else
+		"""
+		x = pivotCoords[0]
+		y = pivotCoords[1]
+
+		if side == 'Over':
+			if self.G.grid[x,y+1] != 0:
+				return 1
+			else:
+				return 0
+		elif side == 'Below':
+			if self.G.grid[x,y-1] != 0:
+				return 1
+			else:
+				return 0
+		elif side == 'Left':
+			if self.G.grid[x-1,y] != 0:
+				return 1
+			else:
+				return 0
+		elif side == 'Right':
+			if self.G.grid[x+1,y] != 0:
+				return 1
+			else:
+				return 0
+		else:
+			print("**ERROR** enter a valid side.")
+
 	def counterClockwiseTransformation(self, reducedCoords):
 		'''
 
@@ -198,22 +230,26 @@ class Protein:
 	#Energy
 	def calculateEnergy(self):
 		"""
-		:return: #returns total energy E in the grid
+		:return: returns total energy E in the grid for a given microstate ms
 		"""
 		E = 0
-		#Iterate over the whole grid
-		for i in range(1,self.G.gSize+1):
+		Sides = ['Over','Below','Left','Right']
+		#Iterate over the whole protein
+		for i in range(1,self.n + 1):
 			#find monom i
 			pos = self.G.findElement(i)
-			#Search for potentially 2 extra neighbours
-			for j in range(1, self.G.gSize + 1):
-				if j == i or j == i-1 or j == i+1:
+			#Search for extra neighbours, add energy-contribution if there is
+			for j in range(1, self.n + 1):
+				if j==i or j==i-1 or j==i+1:
 					continue
 				else:
-					E += kronDelta(j, i)*weakBinding()
+					for k in Sides:
+						n = self.isAdjacent(pos,k)
+						E += weakBinding()*n
+		return E
 
 
 
-protein = Protein(15)
+protein = Protein(100)
 protein.G.draw()
-print(protein.G.findElement(4))
+print(protein.calculateEnergy())
