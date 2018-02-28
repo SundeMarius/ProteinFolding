@@ -1,5 +1,6 @@
 import numpy as np
-import proj2lib as proj, random
+import random
+import Protein as prot
 from matplotlib import pyplot as plt
 
 # Define some things for plotting
@@ -33,16 +34,20 @@ def exercise2(protein,T):
 
 		for i in range(d(11000,0.5,t)):
 			#Choose rotation-way and monom-pivot randomly
-			rotate = random.randint(0, 2)
+			rotate = random.randint(0, 1)
 			pivot = random.randint(2, 14)
 
-			protein.twist(pivot,rotate)
-			Ems = protein.calculateEnergy() #Energy in current microstate
-			Boltz = np.exp(-Ems*B) #Boltzmann-factor in current microstate
-			Eprob += Ems*Boltz
-			Z += Boltz
+			if protein.isLegalTwist(pivot,rotate):
+				protein.twist(pivot,rotate)
+				protein.draw()
+				Ems = protein.calculateEnergy() #Energy in current microstate
+				Boltz = np.exp(-Ems*B) #Boltzmann-factor in current microstate
+				Eprob += Ems*Boltz
+				Z += Boltz
+			else:
+				continue
 		#Calculate mean potential-energy, add to plot-array
-		E[it] = (1/Z)*Eprob
+		#E[it] = (1/Z)*Eprob
 		#Update iterator and temperature
 		t = T[it]
 		it += 1
@@ -56,7 +61,7 @@ def exercise2(protein,T):
 
 def main():
 	#Create a protein with length 15, and misc. variables/intervals
-	protein = proj.Protein(15)
+	protein = prot.Protein(15)
 	T = np.linspace(1e-12,1500,1500)
 
 	exercise2(protein,T)

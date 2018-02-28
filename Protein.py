@@ -38,7 +38,7 @@ class Grid:
 		'''
 
 		a = np.argwhere(self.grid == x)
-		return np.array(a[0])
+		return a[0]
 
 	def searchAdjacent(self, pivotCoords, targetNr):
 		'''
@@ -64,6 +64,27 @@ class Grid:
 		# If target number has not been found:
 		print("\n### ERROR ###\nfunction searchAdjacent cannot find target number", targetNr, "next to initial number\n")
 		return np.array([0, 0])
+
+	def revealAdjacent(self, pivotCoords, side):
+		"""
+        :param pivotCoords: coordinates of the monom of interest
+        :param side: 'Over' is y+1, 'Below' is y-1, 'Left' is x-1, 'Right' is x+1
+        :return: the potential monom on the side of interest
+        """
+		x = pivotCoords[0]
+		y = pivotCoords[1]
+
+		if side == 'Over':
+			return self.grid[x][y + 1]
+		elif side == 'Below':
+			return self.grid[x][y - 1]
+		elif side == 'Left':
+			return self.grid[x - 1][y]
+		elif side == 'Right':
+			return self.grid[x + 1][y]
+		else:
+
+			print("**ERROR** enter a valid side.")
 
 	def present(self):
 		colors = ['white', 'crimson']
@@ -211,7 +232,7 @@ class Protein:
 		:return: Grid; Grid class object with Grid.grid updated with the new twist
 		'''
 
-		assert self.isLegalTwist(x, clockwise)
+		#assert self.isLegalTwist(x, clockwise)
 
 		pivotCoords = self.G.findElement(x)
 
@@ -292,7 +313,7 @@ class Protein:
 			pos = self.G.findElement(i)
 			# Search for extra neighbours, add energy-contribution if there is
 			for k in Sides:
-				j = self.revealAdjacent(pos, k)
+				j = self.G.revealAdjacent(pos, k)
 				if j != 0:
 					E += weakBinding() * kronDelta(i, j)
 				else:
