@@ -5,7 +5,6 @@ import matplotlib.colors as col
 import gc
 
 
-
 class Grid:
 
 	def __init__(self, gridSize):
@@ -77,8 +76,6 @@ class Grid:
 		plt.imshow(self.grid, interpolation='nearest', cmap=cmap, norm=norm)
 		plt.show()
 		'''
-
-
 
 
 class Protein:
