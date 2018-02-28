@@ -1,5 +1,9 @@
 import numpy as np
 import random
+import matplotlib.pyplot as plt
+import matplotlib.colors as col
+import gc
+
 
 
 class Grid:
@@ -20,7 +24,6 @@ class Grid:
 
 		a = np.argwhere(self.grid == x)
 		return np.array(a[0])
-
 
 	def searchAdjacent(self, pivotCoords, targetNr):
 		'''
@@ -46,6 +49,36 @@ class Grid:
 		# If target number has not been found:
 		print("\n### ERROR ###\nfunction searchAdjacent cannot find target number", targetNr, "next to initial number\n")
 		return np.array([0, 0])
+
+	def present(self):
+		colors = ['white', 'crimson']
+		bounds = [0, 1, np.Inf]
+		cmap = col.ListedColormap(colors)
+		norm = col.BoundaryNorm(bounds, cmap.N)
+
+		fig, ax = plt.subplots()
+		ax.matshow(self.grid, cmap=cmap, norm=norm)
+
+		for i in range(self.gSize):
+			for j in range(self.gSize):
+				c = self.grid[j, i]
+				if c != 0:
+					ax.text(i, j, str(c), va='center', ha='center', fontsize=20)
+
+		plt.show()
+
+
+		'''
+		colors = ['white', 'red']
+		bounds = [0, 0.5, np.Inf]
+		cmap = col.ListedColormap(colors)
+		norm = col.BoundaryNorm(bounds, cmap.N)
+
+		plt.imshow(self.grid, interpolation='nearest', cmap=cmap, norm=norm)
+		plt.show()
+		'''
+
+
 
 
 class Protein:
@@ -224,6 +257,12 @@ class Protein:
 			for i in range(x-1, 0, -1):
 				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
 				self.G.grid[pivotCoords[0]+gCurrentCoords[0]-nn][pivotCoords[1]+gCurrentCoords[1]-nn] = gg.grid[gCurrentCoords[0]][gCurrentCoords[1]]
+			# Release unreferenced memory
+			gc.collect()
 
 	def draw(self):
 		self.G.draw()
+
+	def present(self):
+		self.G.present()
+
