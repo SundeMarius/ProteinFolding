@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import numpy as np
 import random
 import matplotlib.pyplot as plt
@@ -263,3 +264,5 @@ class Protein:
 	def present(self):
 		self.G.present()
 
+=======
+>>>>>>> edit-Prot

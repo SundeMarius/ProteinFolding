@@ -175,45 +175,47 @@ class Protein:
 		:return: Grid; Grid class object with Grid.grid updated with the new twist
 		'''
 
-		assert self.isLegalTwist(x, clockwise)
+		if self.isLegalTwist(x, clockwise):
 
-		increasingIncrement = self.isAboveMiddle(x)
-		pivotCoords = self.G.findElement(x)
-		currentCoords = pivotCoords
+			increasingIncrement = self.isAboveMiddle(x)
+			pivotCoords = self.G.findElement(x)
+			currentCoords = pivotCoords
 
-		if (increasingIncrement) and (x < self.G.gSize):
-			for i in range(x + 1, self.G.gSize-1):
-				# Go to next monom:
-				currentCoords = self.searchAdjacent(currentCoords, i)
-				# Get reduced coords (relative to pivot coords):
-				reducedCoords = np.array([pivotCoords[0] - currentCoords[0], currentCoords[1] - pivotCoords[1]])
-				# Transform the reduced coords with clockwise or counterclockwise rotation:
-				if clockwise:
-					transformedCoords = self.clockwiseTransformation(reducedCoords)
-				else:
-					transformedCoords = self.counterClockwiseTransformation(reducedCoords)
-				# Get the endpoint for the given x, and swap values:
-				endCoords = pivotCoords + transformedCoords
-				self.G.grid[endCoords[0]][endCoords[1]], self.G.grid[currentCoords[0], currentCoords[1]] =\
-					self.G.grid[currentCoords[0], currentCoords[1]], self.G.grid[endCoords[0]][endCoords[1]]
+			if (increasingIncrement) and (x < self.G.gSize):
+				for i in range(x + 1, self.G.gSize-1):
+					# Go to next monom:
+					currentCoords = self.searchAdjacent(currentCoords, i)
+					# Get reduced coords (relative to pivot coords):
+					reducedCoords = np.array([pivotCoords[0] - currentCoords[0], currentCoords[1] - pivotCoords[1]])
+					# Transform the reduced coords with clockwise or counterclockwise rotation:
+					if clockwise:
+						transformedCoords = self.clockwiseTransformation(reducedCoords)
+					else:
+						transformedCoords = self.counterClockwiseTransformation(reducedCoords)
+					# Get the endpoint for the given x, and swap values:
+					endCoords = pivotCoords + transformedCoords
+					self.G.grid[endCoords[0]][endCoords[1]], self.G.grid[currentCoords[0], currentCoords[1]] =\
+						self.G.grid[currentCoords[0], currentCoords[1]], self.G.grid[endCoords[0]][endCoords[1]]
 
-		if (not increasingIncrement) and (x > 0):
-			for i in range(x - 1, 0, -1):
-				# Go to next monom:
-				currentCoords = self.searchAdjacent(currentCoords, i)
-				# Get reduced coords (relative to pivot coords):
-				reducedCoords = np.array([pivotCoords[0] - currentCoords[0], currentCoords[1] - pivotCoords[1]])
-				# Transform the reduced coords with clockwise or counterclockwise rotation:
-				if clockwise:
-					transformedCoords = self.clockwiseTransformation(reducedCoords)
-				else:
-					transformedCoords = self.counterClockwiseTransformation(reducedCoords)
-				# Get the endpoint for the given x, and swap values:
-				endCoords = pivotCoords + transformedCoords
-				self.G.grid[endCoords[0]][endCoords[1]], self.G.grid[currentCoords[0], currentCoords[1]] = \
-					self.G.grid[currentCoords[0], currentCoords[1]], self.G.grid[endCoords[0]][endCoords[1]]
+			if (not increasingIncrement) and (x > 0):
+				for i in range(x - 1, 0, -1):
+					# Go to next monom:
+					currentCoords = self.searchAdjacent(currentCoords, i)
+					# Get reduced coords (relative to pivot coords):
+					reducedCoords = np.array([pivotCoords[0] - currentCoords[0], currentCoords[1] - pivotCoords[1]])
+					# Transform the reduced coords with clockwise or counterclockwise rotation:
+					if clockwise:
+						transformedCoords = self.clockwiseTransformation(reducedCoords)
+					else:
+						transformedCoords = self.counterClockwiseTransformation(reducedCoords)
+					# Get the endpoint for the given x, and swap values:
+					endCoords = pivotCoords + transformedCoords
+					self.G.grid[endCoords[0]][endCoords[1]], self.G.grid[currentCoords[0], currentCoords[1]] = \
+						self.G.grid[currentCoords[0], currentCoords[1]], self.G.grid[endCoords[0]][endCoords[1]]
 
-		return self.G
+			return self.G
+		else:
+			return self.G
 
 	#Energy
 	def calculateEnergy(self):
