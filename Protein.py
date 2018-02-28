@@ -1,11 +1,26 @@
-<<<<<<< HEAD
 import numpy as np
 import random
 import matplotlib.pyplot as plt
 import matplotlib.colors as col
 import gc
 
+#Additional functions
+def weakBinding():
+	return random.uniform(-10.4e-21,-3.47e-21)
 
+def kronDelta(i,j):
+	"""
+	:param i: Monom number i
+	:param j: Monom number j
+	:return: 0 if i and j is subsequential, 1 otherwise
+	"""
+	if (abs(i-j) <= 1):
+		return 0
+	else:
+		return 1
+
+
+#Classes
 class Grid:
 
 	def __init__(self, gridSize):
@@ -264,5 +279,24 @@ class Protein:
 	def present(self):
 		self.G.present()
 
-=======
->>>>>>> edit-Prot
+	# Energy
+	def calculateEnergy(self):
+		"""
+		:return: returns total energy E in the grid for a given microstate ms
+		"""
+		E = 0
+		Sides = ['Over', 'Below', 'Left', 'Right']
+		# Iterate over the whole protein
+		for i in range(1, self.n + 1):
+			# find monom i
+			pos = self.G.findElement(i)
+			# Search for extra neighbours, add energy-contribution if there is
+			for k in Sides:
+				j = self.revealAdjacent(pos, k)
+				if j != 0:
+					E += weakBinding() * kronDelta(i, j)
+				else:
+					continue
+		# Return E when done.
+		return E
+
