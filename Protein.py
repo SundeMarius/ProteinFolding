@@ -68,7 +68,8 @@ class Grid:
 			return np.array([pivotCoords[0], pivotCoords[1] + 1])
 
 		# If target number has not been found:
-		print("\n### ERROR ###\nfunction searchAdjacent cannot find target number", targetNr, "next to initial number\n")
+#		print("\n### ERROR ###\nfunction searchAdjacent cannot find target number", targetNr, "next to initial number\n")
+		# The previous line was removed because it falsely displayed an error in the diameter function
 		return np.array([0, 0])
 
 	def revealAdjacent(self, pivotCoords, side):
