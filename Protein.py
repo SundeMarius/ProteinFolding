@@ -19,11 +19,10 @@ def kronDelta(i,j):
 		return 1
 
 def randomBool():
-    return random.choice([True, False])
+	return random.choice([True, False])
 
 
-
-#Classes
+# Classes
 class Grid:
 
 	def __init__(self, gridSize):
@@ -31,23 +30,29 @@ class Grid:
 		self.grid = np.zeros((gridSize, gridSize)).astype(np.int16)
 
 	def draw(self):
+		"""
+
+		:return: None; prints a visualisation of the grid to the screen
+		"""
 		print(self.grid)
 
 	def findElement(self, x):
-		'''
+		"""
+
 		:param x: Int; Number of the monomer we want
 		:return: np.array; The position of the given x ([i, j])
-		'''
+		"""
 
 		a = np.argwhere(self.grid == x)
 		return a[0]
 
 	def searchAdjacent(self, pivotCoords, targetNr):
-		'''
+		"""
+
 		:param pivotCoords: np.array; The coordinates of the point we are searching next to
 		:param targetNr: Int; The number assigned to the point we are searching for
 		:return: np.array; The coordinates of the target number
-		'''
+		"""
 
 		# Check column:
 		if (pivotCoords[0] != 0) and (self.grid[pivotCoords[0] - 1][pivotCoords[1]] == targetNr):
@@ -68,6 +73,7 @@ class Grid:
 
 	def revealAdjacent(self, pivotCoords, side):
 		"""
+
         :param pivotCoords: coordinates of the monom of interest
         :param side: 'Over' is y+1, 'Below' is y-1, 'Left' is x-1, 'Right' is x+1
         :return: the potential monom on the side of interest
@@ -88,6 +94,10 @@ class Grid:
 			print("**ERROR** enter a valid side.")
 
 	def present(self):
+		"""
+
+		:return: None; plots a pretty picture of the grid, suited to the protein
+		"""
 		colors = ['white', 'crimson']
 		bounds = [0, 1, np.Inf]
 		cmap = col.ListedColormap(colors)
@@ -116,24 +126,34 @@ class Protein:
 		self.midValue = int((length + 1) / 2)
 
 	def isAboveMiddle(self, x):
-		'''
+		"""
+
 		:param x: Int, the number assigned to the pivot point
 		:return: Bool, True if x > middle value (average). Randomly True or False if x == middle. Else False
-		'''
+		"""
 		if (x == self.midValue):
 			return randomBool()
 		else:
 			return (x > self.midValue)
 
 	def draw(self):
+		"""
+
+		:return: None; prints a visualisation of the grid to the screen
+		"""
 		self.G.draw()
 
 	def present(self):
+		"""
+
+		:return: None; plots a pretty picture of the protein
+		"""
 		self.G.present()
 
 	def calculateEnergy(self):
 		"""
-		:return: returns total energy E in the grid for a given microstate ms
+
+		:return: Float; Total energy E in the grid for a given microstate ms
 		"""
 		E = 0
 		Sides = ['Over', 'Below', 'Left', 'Right']
@@ -152,12 +172,12 @@ class Protein:
 		return E
 
 	def twist(self, x, clockwise):
-		'''
+		"""
 
 		:param x: int, the number of the pivot monomer
 		:param clockwise: bool, True if the rotation is clockwise
-		:return: bool, True if the rotation is legal
-		'''
+		:return: bool, True if the rotation is legal. If true, the member grid is changed according to the twist
+		"""
 
 		# Find the coordinates of the pivot monomer
 		pivotCoords = self.G.findElement(x)
@@ -249,17 +269,20 @@ class Protein:
 		return True
 
 	def randomMonomer(self):
-		'''
+		"""
+
 		:return: Int; A random monomer in the polymer
-		'''
+		"""
 		return random.randint(2, self.n - 1)
 
 	def randomTwist(self):
-		'''
+		"""
+
 		:return: None; Performs a successful twist
-		'''
+		"""
 		isLegal = False
 		while not isLegal:
 			randMono = self.randomMonomer()
 			randBool = randomBool()
 			isLegal = self.twist(randMono, randBool)
+
