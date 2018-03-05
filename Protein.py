@@ -2,7 +2,6 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import matplotlib.colors as col
-import gc
 
 #Additional functions
 def weakBinding():
@@ -19,6 +18,10 @@ def kronDelta(i,j):
 	else:
 		return 1
 
+def randomBool():
+    return random.choice([True, False])
+
+
 
 #Classes
 class Grid:
@@ -32,7 +35,6 @@ class Grid:
 
 	def findElement(self, x):
 		'''
-
 		:param x: Int; Number of the monomer we want
 		:return: np.array; The position of the given x ([i, j])
 		'''
@@ -42,7 +44,6 @@ class Grid:
 
 	def searchAdjacent(self, pivotCoords, targetNr):
 		'''
-
 		:param pivotCoords: np.array; The coordinates of the point we are searching next to
 		:param targetNr: Int; The number assigned to the point we are searching for
 		:return: np.array; The coordinates of the target number
@@ -104,17 +105,6 @@ class Grid:
 		plt.show()
 
 
-		'''
-		colors = ['white', 'red']
-		bounds = [0, 0.5, np.Inf]
-		cmap = col.ListedColormap(colors)
-		norm = col.BoundaryNorm(bounds, cmap.N)
-
-		plt.imshow(self.grid, interpolation='nearest', cmap=cmap, norm=norm)
-		plt.show()
-		'''
-
-
 class Protein:
 
 	def __init__(self, length):
@@ -123,176 +113,17 @@ class Protein:
 		self.G = Grid(self.N)
 		self.G.grid[int(np.round(self.N / 2)), int(np.round(self.N / 2 - self.n / 2)): int(np.round(self.N / 2 - \
 			self.n / 2)) + self.n] = np.linspace(1, self.n, self.n)  # .astype(np.int16)
-		self.midValue = (length + 1) / 2
-
-	def clockwiseTransformation(self, reducedCoords):
-		'''
-
-		:param reducedCoords: np.array; The relative coordinates [m, n]
-		:return: np.array; the transformed relative coordinates in clockwise transformation [-m, n]
-		'''
-
-		return np.array([-reducedCoords[1], reducedCoords[0]])
-
-	def counterClockwiseTransformation(self, reducedCoords):
-		'''
-
-		:param reducedCoords: np.array; The relative coordinates [m, n]
-		:return: np.array; the transformed relative coordinates in clockwise transformation [m, -n]
-		'''
-
-		return np.array([reducedCoords[1], -reducedCoords[0]])
+		self.midValue = int((length + 1) / 2)
 
 	def isAboveMiddle(self, x):
 		'''
-
 		:param x: Int, the number assigned to the pivot point
 		:return: Bool, True if x > middle value (average). Randomly True or False if x == middle. Else False
 		'''
 		if (x == self.midValue):
-			return random.randint(0, 1)
+			return randomBool()
 		else:
 			return (x > self.midValue)
-
-	def isLegalTwist(self, x, clockwise):
-		'''
-
-		:param x: Int; The number assigned to the pivot point
-		:param clockwise: Bool; True if clockwise rotation
-		:return: Bool; True if twist is legal, else False
-		'''
-
-		pivotCoords = self.G.findElement(x)
-
-		# Make a copy of the swapping area and the non-swapping area
-
-		# Stationary copy
-		GG = self.G.grid.__deepcopy__(self)
-		GG2 = self.G.grid.__deepcopy__(self)
-		currentCoords = pivotCoords
-
-		if self.isAboveMiddle(x):
-			# Rotation copy
-			nn = self.n - x
-			gg = Grid(2 * nn + 1)
-			gg.grid = GG[pivotCoords[0] - nn: pivotCoords[0] + nn + 1, pivotCoords[1] - nn: pivotCoords[1] + nn + 1]
-			gCurrentCoords = np.array([nn, nn])
-			gg.grid[gCurrentCoords[0], gCurrentCoords[1]] = 0
-			for i in range(x - 1, x - nn - 1, -1):
-				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
-				gg.grid[gCurrentCoords[0]][gCurrentCoords[1]] = 0
-			# Do the rotation
-			if clockwise:
-				gg.grid = np.rot90(gg.grid, -1)
-			else:
-				gg.grid = np.rot90(gg.grid, 1)
-			# Remove excess elements from original grid
-			for i in range(x + 1, self.n + 1):
-				currentCoords = self.G.searchAdjacent(currentCoords, i)
-				GG2[currentCoords[0]][currentCoords[1]] = 0
-			# Check if the area the protein now wants to go to is empty
-			gCurrentCoords = np.array([nn, nn])
-			for i in range(x + 1, self.n + 1):
-				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
-				if (GG2[pivotCoords[0] + gCurrentCoords[0] - nn][pivotCoords[1] + gCurrentCoords[1] - nn] != 0):
-					return False
-
-		else:
-			# Rotation copy
-			nn = x - 1
-			gg = Grid(2 * nn + 1)
-			gg.grid = GG[pivotCoords[0] - nn: pivotCoords[0] + nn + 1, pivotCoords[1] - nn: pivotCoords[1] + nn + 1]
-			gCurrentCoords = np.array([nn, nn])
-			gg.grid[gCurrentCoords[0], gCurrentCoords[1]] = 0
-			for i in range(x + 1, x + nn + 1):
-				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
-				gg.grid[gCurrentCoords[0], gCurrentCoords[1]] = 0
-			# Do the rotation
-			if clockwise:
-				gg.grid = np.rot90(gg.grid, -1)
-			else:
-				gg.grid = np.rot90(gg.grid, 1)
-			# Remove excess elements from original grid
-			for i in range(x - 1, 0, -1):
-				currentCoords = self.G.searchAdjacent(currentCoords, i)
-				GG2[currentCoords[0], currentCoords[1]] = 0
-			# Check if the area the protein now wants to go to is empty
-			gCurrentCoords = np.array([nn, nn])
-			for i in range(x - 1, 0, -1):
-				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
-				if (GG2[pivotCoords[0] + gCurrentCoords[0] - nn][pivotCoords[1] + gCurrentCoords[1] - nn] != 0):
-					return False
-		return True
-
-	def twist(self, x, clockwise):
-		'''
-
-		:param x: Int; The number corresponding to the pivot monome
-		:param clockwise: Bool; True if rotation is clockwise, else False
-		:return: Grid; Grid class object with Grid.grid updated with the new twist
-		'''
-
-		#assert self.isLegalTwist(x, clockwise)
-
-		pivotCoords = self.G.findElement(x)
-
-		# Make a copy of the swapping area and the non-swapping area
-
-		# Stationary copy
-		GG = self.G.grid.__deepcopy__(self)
-		currentCoords = pivotCoords
-
-		if self.isAboveMiddle(x):
-			# Rotation copy
-			nn = self.n - x
-			gg = Grid(2*nn + 1)
-			gg.grid = GG[pivotCoords[0]-nn: pivotCoords[0]+nn+1, pivotCoords[1]-nn: pivotCoords[1]+nn+1]
-			gCurrentCoords = np.array([nn, nn])
-			gg.grid[gCurrentCoords[0], gCurrentCoords[1]] = 0
-			for i in range(x-1, x-nn-1, -1):
-				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
-				gg.grid[gCurrentCoords[0]][gCurrentCoords[1]] = 0
-			# Do the rotation
-			if clockwise:
-				gg.grid = np.rot90(gg.grid, -1)
-			else:
-				gg.grid = np.rot90(gg.grid, 1)
-			#Remove excess elements from original grid
-			for i in range(x+1, self.n + 1):
-				currentCoords = self.G.searchAdjacent(currentCoords, i)
-				self.G.grid[currentCoords[0]][currentCoords[1]] = 0
-			# Insert rotated matrix into updated grid
-			gCurrentCoords = np.array([nn, nn])
-			for i in range(x+1, self.n + 1):
-				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
-				self.G.grid[pivotCoords[0]+gCurrentCoords[0]-nn][pivotCoords[1]+gCurrentCoords[1]-nn] = gg.grid[gCurrentCoords[0]][gCurrentCoords[1]]
-
-		else:
-			# Rotation copy
-			nn = x - 1
-			gg = Grid(2*nn + 1)
-			gg.grid = GG[pivotCoords[0]-nn: pivotCoords[0]+nn+1, pivotCoords[1]-nn: pivotCoords[1]+nn+1]
-			gCurrentCoords = np.array([nn, nn])
-			gg.grid[gCurrentCoords[0], gCurrentCoords[1]] = 0
-			for i in range(x+1, x + nn + 1):
-				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
-				gg.grid[gCurrentCoords[0], gCurrentCoords[1]] = 0
-			# Do the rotation
-			if clockwise:
-				gg.grid = np.rot90(gg.grid, -1)
-			else:
-				gg.grid = np.rot90(gg.grid, 1)
-			# Remove excess elements from original grid
-			for i in range(x-1, 0, -1):
-				currentCoords = self.G.searchAdjacent(currentCoords, i)
-				self.G.grid[currentCoords[0], currentCoords[1]] = 0
-			# Insert rotated matrix into updated grid
-			gCurrentCoords = np.array([nn, nn])
-			for i in range(x-1, 0, -1):
-				gCurrentCoords = gg.searchAdjacent(gCurrentCoords, i)
-				self.G.grid[pivotCoords[0]+gCurrentCoords[0]-nn][pivotCoords[1]+gCurrentCoords[1]-nn] = gg.grid[gCurrentCoords[0]][gCurrentCoords[1]]
-			# Release unreferenced memory
-			gc.collect()
 
 	def draw(self):
 		self.G.draw()
@@ -300,7 +131,6 @@ class Protein:
 	def present(self):
 		self.G.present()
 
-	# Energy
 	def calculateEnergy(self):
 		"""
 		:return: returns total energy E in the grid for a given microstate ms
@@ -321,3 +151,115 @@ class Protein:
 		# Return E when done.
 		return E
 
+	def twist(self, x, clockwise):
+		'''
+
+		:param x: int, the number of the pivot monomer
+		:param clockwise: bool, True if the rotation is clockwise
+		:return: bool, True if the rotation is legal
+		'''
+
+		# Find the coordinates of the pivot monomer
+		pivotCoords = self.G.findElement(x)
+
+		# Find out if you should iterate up or down
+		itUp = self.isAboveMiddle(x)
+
+		# Make a copy to avoid doing damage to the actual grid
+		G = self.G.grid.__deepcopy__(self)
+
+		# Make a smaller matrix (g) to be rotated.
+		# How we define that matrix' size must depend on the distance from the end of the protein
+		if itUp:
+			# Length of the rotation matrix
+			n = self.n - x
+		else:
+			# Length of the rotation matrix
+			n = x - 1
+		g = np.zeros((2*n + 1, 2*n + 1))
+
+		if itUp:
+			# Place the monomer numbers higher than x in the rotation matrix and remove them from the stationary copy
+			Gcoords = pivotCoords
+			for i in range(x+1, self.n+1):
+				# Find the next monomer to place in g
+				Gcoords = self.G.searchAdjacent(Gcoords, i)
+				# Find the relative coordinates between this point and the pivot point
+				relCoordRow = pivotCoords[0] - Gcoords[0]
+				relCoordCol = Gcoords[1] - pivotCoords[1]
+				gcoords = np.array([n - relCoordRow, n + relCoordCol])
+				# Place correctly in g
+				g[gcoords[0]][gcoords[1]] = i
+				# Remove the monomer from G
+				G[Gcoords[0]][Gcoords[1]] = 0
+		else:
+			# Place the monomer number lower than x in the rotation matrix and remove the from the stationary copy
+			Gcoords = pivotCoords
+			for i in range(x-1, 0, -1):
+				# Find the next monomer to place in g
+				Gcoords = self.G.searchAdjacent(Gcoords, i)
+				# Find the relative coordinates between this point and the pivot point
+				relCoordRow = pivotCoords[0] - Gcoords[0]
+				relCoordCol = Gcoords[1] - pivotCoords[1]
+				gcoords = np.array([n - relCoordRow, n + relCoordCol])
+				# Place correctly in g
+				g[gcoords[0]][gcoords[1]] = i
+				# Remove the monomer from G
+				G[Gcoords[0]][Gcoords[1]] = 0
+
+		# Rotate g
+		if clockwise:
+			g = np.rot90(g, -1)
+		else:
+			g = np.rot90(g, 1)
+
+		if itUp:
+			gPivotCoords = np.array([n, n])
+			for i in range(x+1, self.n+1):
+				# Find the next monomer to check in g
+#				gcoords = self.G.searchAdjacent(gcoords, i)
+				gcoords = np.argwhere(g == i)[0]
+				# Find the relative coordinates between this point and the pivot point
+				relCoordRow = gPivotCoords[0] - gcoords[0]
+				relCoordCol = gcoords[1] - gPivotCoords[1]
+				Gcoords = pivotCoords + [-relCoordRow, relCoordCol]
+				# Check if the corresponding element in g is sent to 0. If yes: execute the transfer
+				if G[Gcoords[0]][Gcoords[1]] == 0:
+					G[Gcoords[0]][Gcoords[1]] = g[gcoords[0]][gcoords[1]]
+				else:
+					return False
+		else:
+			gPivotCoords = np.array([n, n])
+			for i in range(x-1, 0, -1):
+				# Find the next monomer to check in g
+#				gcoords = self.G.searchAdjacent(gcoords, i)
+				gcoords = np.argwhere(g == i)[0]
+				# Find the relative coordinates between this point and the pivot point
+				relCoordRow = gPivotCoords[0] - gcoords[0]
+				relCoordCol = gcoords[1] - gPivotCoords[1]
+				Gcoords = pivotCoords + [-relCoordRow, relCoordCol]
+				# Check if the corresponding element in g is sent to 0. If yes: execute the transfer
+				if G[Gcoords[0]][Gcoords[1]] == 0:
+					G[Gcoords[0]][Gcoords[1]] = g[gcoords[0]][gcoords[1]]
+				else:
+					return False
+
+		# If it was never denied, we now change the grid. Return True to mark the twist was successful
+		self.G.grid = G
+		return True
+
+	def randomMonomer(self):
+		'''
+		:return: Int; A random monomer in the polymer
+		'''
+		return random.randint(2, self.n - 1)
+
+	def randomTwist(self):
+		'''
+		:return: None; Performs a successful twist
+		'''
+		isLegal = False
+		while not isLegal:
+			randMono = self.randomMonomer()
+			randBool = randomBool()
+			isLegal = self.twist(randMono, randBool)
