@@ -172,6 +172,43 @@ class Protein:
 		# Return E when done.
 		return E
 
+	def minimizeEnergy(self,T,dmax,s):
+
+		kb = 1.38e-23  # J/K (Boltzmann's constant)
+		B = 1 / (kb * T) #Boltzmann-parameter
+
+		#Create a copy-protein
+		prot2 = self
+		Ems1 = 0
+
+		# Twist protein d times (d+1 microstates), calculate mean energy
+		for i in range(int(dmax * np.exp(-s * T))):
+
+			# Choose rotation-way and monom-pivot randomly, and random fluctuation
+			rotate = self.randomBool()
+			pivot = prot2.randomMonomer()
+			r = random.randint(0, 1)
+
+			# twist the copy-protein
+			twisted = prot2.twist(pivot, rotate)
+
+			#Check if twist was legal
+			if twisted:
+
+				# Calculate energy in copy-protein
+				Ems2 = prot2.calculateEnergy()  # Energy in current microstate
+				# Check if new energy-state is less than previous, update protein if it is (energy-minimization)
+				if Ems2 < Ems1:
+					protein = prot2  # Update protein
+					Ems1 = Ems2  # Update energy of protein
+				# Add thermal fluctuations (see worksheet)
+				elif r < np.exp(-B * (Ems2 - Ems1)):
+					protein = prot2  # Update protein
+					Ems1 = Ems2  # Update energy of protein
+			else:
+				# Try again until twisting is possible
+				continue
+
 	def twist(self, x, clockwise):
 		"""
 

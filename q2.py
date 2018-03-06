@@ -9,20 +9,12 @@ kb = 1.38e-23  # J/K (Boltzmann's constant)
 font = {'family': 'normal', 'weight': 'bold', 'size': 16}
 plt.rc('font', **font)
 
-def meanEnergy(protein,T):
+def meanEnergy(protein,T,dmax,s):
 	"""
 	:param protein: The polymer to twist
 	:param T: temperature-interval
 	:return: non (creates a plot that solves exercise 2.1)
 	"""
-	def d(dmax,s,T):
-		"""
-		:param dmax: d at T = 0
-		:param s: decreasing-rate (choose a staisfactory value, s>0)
-		:param T: temperature in K
-		:return: the number of necessary iterations d
-		"""
-		return int(dmax*np.exp(-s*T))
 
 	E = np.zeros(len(T))
 
@@ -38,12 +30,12 @@ def meanEnergy(protein,T):
 		Ems1 = 0
 
 		# Twist protein d times (d+1 microstates), calculate mean energy
-		for i in range(d(11000,0.006,t)):
+		for i in range(int(dmax*np.exp(-s*t))):
 
 			#Choose rotation-way and monom-pivot randomly
 			rotate = prot.randomBool()
 			pivot = prot2.randomMonomer()
-
+			r = random.randint(0,1)
 			#twist the copy-protein
 			twisted = prot2.twist(pivot,rotate)
 
@@ -56,7 +48,7 @@ def meanEnergy(protein,T):
 					protein = prot2 #Update protein
 					Ems1 = Ems2 #Update energy of protein
 				#Add thermal fluctuations (see worksheet)
-				elif random.randint(0,1) < np.exp(-B*(Ems2-Ems1)):
+				elif r < np.exp(-B*(Ems2-Ems1)):
 					protein = prot2 #Update protein
 					Ems1=Ems2 #Update energy of protein
 			else:
