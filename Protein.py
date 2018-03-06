@@ -173,7 +173,12 @@ class Protein:
 		return E
 
 	def minimizeEnergy(self,T,dmax,s):
-
+		"""
+		:param T: Temperature t
+		:param dmax: maximum amount of iterations
+		:param s: d-decending rate
+		:return: protein with probably lowest possible energy (fluctuations is added)
+		"""
 		kb = 1.38e-23  # J/K (Boltzmann's constant)
 		B = 1 / (kb * T) #Boltzmann-parameter
 
@@ -185,9 +190,9 @@ class Protein:
 		for i in range(int(dmax * np.exp(-s * T))):
 
 			# Choose rotation-way and monom-pivot randomly, and random fluctuation
-			rotate = self.randomBool()
+			rotate = randomBool()
 			pivot = prot2.randomMonomer()
-			r = random.randint(0, 1)
+			r = random.uniform(0, 1)
 
 			# twist the copy-protein
 			twisted = prot2.twist(pivot, rotate)
@@ -208,6 +213,8 @@ class Protein:
 			else:
 				# Try again until twisting is possible
 				continue
+
+		return protein
 
 	def twist(self, x, clockwise):
 		"""
