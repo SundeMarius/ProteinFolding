@@ -3,18 +3,18 @@ import random
 import Protein as prot
 from matplotlib import pyplot as plt
 
+kb = 1.38e-23  # J/K (Boltzmann's constant)
+
 # Define some things for plotting
 font = {'family': 'normal', 'weight': 'bold', 'size': 16}
 plt.rc('font', **font)
 
-def exercise2(protein,T):
+def meanEnergy(protein,T):
 	"""
 	:param protein: The polymer to twist
 	:param T: temperature-interval
 	:return: non (creates a plot that solves exercise 2.1)
 	"""
-	kb = 1.38e-23  # J/K (Boltzmann's constant)
-	Z, Ems, Boltz, Eprob = (0,0,0,0) #Partition-sum, Energy in current microstate, boltzmann-factor, weighted energy (eq. 4)
 	def d(dmax,s,T):
 		"""
 		:param dmax: d at T = 0
@@ -25,45 +25,73 @@ def exercise2(protein,T):
 		return int(dmax*np.exp(-s*T))
 
 	E = np.zeros(len(T))
-	t = T[0]
-	it = 1
-	while it < len(T):
 
-		#Twist protein d times (d+1 microstates), calculate Z
+	for k in range(len(T)):
+		# Update temperature and boltzmann's paramter beta
+		t = T[k]
 		B = 1/(kb*t)
 
-		for i in range(d(11000,0.5,t)):
+		Eprob, Z = (0,0) # Zero out mean energy and Partitioning-sum (eq. 4)
+
+		#Create a copy-protein
+		prot2 = prot.Protein(protein.n)
+		Ems1 = 0
+
+		# Twist protein d times (d+1 microstates), calculate mean energy
+		for i in range(d(11000,0.006,t)):
+
 			#Choose rotation-way and monom-pivot randomly
-			rotate = random.randint(0, 1)
-			pivot = random.randint(2, 14)
+			rotate = prot.randomBool()
+			pivot = prot2.randomMonomer()
 
-			if protein.isLegalTwist(pivot,rotate):
-				protein.twist(pivot,rotate)
-				protein.draw()
-				Ems = protein.calculateEnergy() #Energy in current microstate
-				Boltz = np.exp(-Ems*B) #Boltzmann-factor in current microstate
-				Eprob += Ems*Boltz
-				Z += Boltz
+			#twist the copy-protein
+			twisted = prot2.twist(pivot,rotate)
+
+			if twisted:
+
+				#Calculate energy in copy-protein
+				Ems2 = prot2.calculateEnergy() #Energy in current microstate
+				#Check if new energy-state is less than previous, update protein if it is (energy-minimization)
+				if Ems2 < Ems1:
+					protein = prot2 #Update protein
+					Ems1 = Ems2 #Update energy of protein
+				#Add thermal fluctuations (see worksheet)
+				elif random.randint(0,1) < np.exp(-B*(Ems2-Ems1)):
+					protein = prot2 #Update protein
+					Ems1=Ems2 #Update energy of protein
 			else:
+				#Try again until twisting is possible
 				continue
-		#Calculate mean potential-energy, add to plot-array
-		#E[it] = (1/Z)*Eprob
-		#Update iterator and temperature
-		t = T[it]
-		it += 1
 
+			#Calculate contribution to mean energy
+			Ems = Ems2
+			Boltz = np.exp(Ems * B)  # Boltzmann-factor in current microstate
+			Eprob += Ems * Boltz
+			Z += Boltz
+
+		#Add result to energy-array
+		if Z > 0:
+			E[k] = (1/Z)*Eprob
+			print(E[k])
+
+	#Plot results
 	plt.xlabel(r"Temperature $T[K]$")
 	plt.ylabel(r"Mean energy $E$ of polymer")
 	plt.grid(), plt.legend(loc="best")
 	plt.plot(T,E,color="r",label="$E(T)$")
 	plt.show()
 
+def BindingEnergy():
 
 def main():
 	#Create a protein with length 15, and misc. variables/intervals
 	protein = prot.Protein(15)
-	T = np.linspace(1e-12,1500,1500)
+	Nt = 700 #number of steps in temp-interval
+	To = 1e-2
+	Tf = 1500
+	T = np.linspace(To,Tf,Nt+1)
 
-	exercise2(protein,T)
+	#Calculate mean energy of protein
+	meanEnergy(protein,T)
 
 main()
