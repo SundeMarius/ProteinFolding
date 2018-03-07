@@ -1,89 +1,136 @@
 import numpy as np
-import random
 import Protein as prot
 from matplotlib import pyplot as plt
-
-kb = 1.38e-23  # J/K (Boltzmann's constant)
 
 # Define some things for plotting
 font = {'family': 'normal', 'weight': 'bold', 'size': 16}
 plt.rc('font', **font)
 
-def meanEnergy(protein,T,dmax,s):
-	"""
-	:param protein: The polymer to twist
-	:param T: temperature-interval
-	:return: non (creates a plot that solves exercise 2.1)
-	"""
+Trange = np.array([10e-12, 1500])  # Range of possible temperatures
+acc = 20  # Number of plotting points
 
-	E = np.zeros(len(T))
 
-	for k in range(len(T)):
-		# Update temperature and boltzmann's paramter beta
-		t = T[k]
-		B = 1/(kb*t)
+def quest_2_1(acc):
+	# Parameters for protein of length 15
+	dmax = 10000
+	s = 0.002
 
-		Eprob, Z = (0,0) # Zero out mean energy and Partitioning-sum (eq. 4)
+	# x-axis of plot
+	Tvalues = np.linspace(Trange[0], Trange[1], acc)
+	# y-axis of plot
+	Evalues = np.zeros(acc)
 
-		#Create a copy-protein
-		prot2 = prot.Protein(protein.n)
-		Ems1 = 0
+	for i in range(acc):
+		# Find number of twists necessary
+		D = int(dmax * np.exp(-s * Tvalues[i]))
+		# Define a new protein for each temperature
+		P = prot.Protein(15)
 
-		# Twist protein d times (d+1 microstates), calculate mean energy
-		for i in range(int(dmax*np.exp(-s*t))):
+		energies = np.zeros(D)
+		print("\n\nTemperature:", Tvalues[i], "|| # Twists:", D, "|| Iter:", i + 1, "of", acc, "\n\n")
 
-			#Choose rotation-way and monom-pivot randomly
-			rotate = prot.randomBool()
-			pivot = prot2.randomMonomer()
-			r = random.randint(0,1)
-			#twist the copy-protein
-			twisted = prot2.twist(pivot,rotate)
+		for j in range(D):
+			# Perform a single twist with energy and thermal fluctuation conserns
+			P = prot.randomTwist(P, Tvalues[i])
+			# Add energy to list
+			energies[j] = P.E
+		# Find the average given the temperature
+		Evalues[i] = np.average(energies)
 
-			if twisted:
-
-				#Calculate energy in copy-protein
-				Ems2 = prot2.calculateEnergy() #Energy in current microstate
-				#Check if new energy-state is less than previous, update protein if it is (energy-minimization)
-				if Ems2 < Ems1:
-					protein = prot2 #Update protein
-					Ems1 = Ems2 #Update energy of protein
-				#Add thermal fluctuations (see worksheet)
-				elif r < np.exp(-B*(Ems2-Ems1)):
-					protein = prot2 #Update protein
-					Ems1=Ems2 #Update energy of protein
-			else:
-				#Try again until twisting is possible
-				continue
-
-			#Calculate contribution to mean energy
-			Ems = Ems2
-			Boltz = np.exp(Ems * B)  # Boltzmann-factor in current microstate
-			Eprob += Ems * Boltz
-			Z += Boltz
-
-		#Add result to energy-array
-		if Z > 0:
-			E[k] = (1/Z)*Eprob
-			print(E[k])
-
-	#Plot results
-	plt.xlabel(r"Temperature $T[K]$")
-	plt.ylabel(r"Mean energy $E$ of polymer")
-	plt.grid(), plt.legend(loc="best")
-	plt.plot(T,E,color="r",label="$E(T)$")
+	# Plot
+	plt.plot(Tvalues, Evalues)
+	plt.xlabel(r"T")
+	plt.ylabel(r"[E]")
 	plt.show()
 
-def BindingEnergy():
 
-def main():
-	#Create a protein with length 15, and misc. variables/intervals
-	protein = prot.Protein(15)
-	Nt = 700 #number of steps in temp-interval
-	To = 1e-2
-	Tf = 1500
-	T = np.linspace(To,Tf,Nt+1)
+def quest_2_2(acc):
+	# x-axis of plot
+	twistValues = np.linspace(0, 5000, acc)
+	# y-axis of plot
+	Evalues = np.zeros(acc)
 
-	#Calculate mean energy of protein
-	meanEnergy(protein,T)
+	dist = int(twistValues[1] - twistValues[0])
 
-main()
+
+	### T = 0 ###
+
+
+	# Define a protein
+	P = prot.Protein(15)
+
+	for i in range(acc):
+		for j in range(dist):
+			P = prot.randomTwist(P, 10e-12)  # Cannot make temperature == 0 because of 0 division error
+		Evalues[i] = P.E
+
+		print("Iter: ", i+1, "/", acc)
+
+	# Plot
+	plt.plot(twistValues, Evalues, label=r"T = 0K")
+	plt.legend()
+	plt.xlabel(r"Twists")
+	plt.ylabel(r"E")
+	plt.show()
+
+
+	### T = 500 ###
+
+
+	# Define another protein
+	P = prot.Protein(15)
+
+	for i in range(acc):
+		for j in range(dist):
+			P = prot.randomTwist(P, 500)
+		Evalues[i] = P.E
+
+		print("Iter: ", i+1, "/", acc)
+
+	# Plot
+	plt.plot(twistValues, Evalues, label=r"T = 500K")
+	plt.legend()
+	plt.xlabel(r"Twists")
+	plt.ylabel(r"E")
+	plt.show()
+
+
+def quest_2_5(acc):
+	# Parameters for protein of length 30
+	dmax = 10000	### DON'T KNOW THESE YET
+	s = 0.002
+
+	# x-axis of plot
+	Tvalues = np.linspace(Trange[0], Trange[1], acc)
+	# y-axis of plot
+	Evalues = np.zeros(acc)
+
+	for i in range(acc):
+		# Find number of twists necessary
+		D = int(dmax * np.exp(-s * Tvalues[i]))
+		# Define a new protein for each temperature
+		P = prot.Protein(30)
+
+		energies = np.zeros(D)
+		print("\n\nTemperature:", Tvalues[i], "|| # Twists:", D, "|| Iter:", i + 1, "of", acc, "\n\n")
+
+		for j in range(D):
+			# Perform a single twist with energy and thermal fluctuation conserns
+			P = prot.randomTwist(P, Tvalues[i])
+			# Add energy to list
+			energies[j] = P.E
+		# Find the average given the temperature
+		Evalues[i] = np.average(energies)
+
+	# Plot
+	plt.plot(Tvalues, Evalues)
+	plt.xlabel(r"T")
+	plt.ylabel(r"[E]")
+	plt.show()
+
+
+# Comment out the ones you don't want to run
+
+#quest_2_1(acc)
+#quest_2_2(acc)
+quest_2_5(acc)

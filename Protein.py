@@ -2,6 +2,8 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import matplotlib.colors as col
+import scipy.spatial.distance as ssd
+import copy
 
 #Additional functions
 def weakBinding():
@@ -20,6 +22,40 @@ def kronDelta(i,j):
 
 def randomBool():
 	return random.choice([True, False])
+
+def randomTwist(protein, T):
+	"""
+	Will generate a random, legal twist, and attempt it. If the resulting energy  is less, the twist is executed.
+	Else, the twist is executed anyway if and only if the thermal fluctuations allow it. Else, nothing happens.
+
+	:param protein: Protein; the protein object we want to twist
+	:param T: Float; the temperature the twist attempts happens at
+	:return: Protein; the (possibly) twisted object
+	"""
+	newProtein = copy.deepcopy(protein)
+	kb = 1.38e-23  # J/K (Boltzmann's constant)
+	B = 1 / (kb * T)  # Boltzmann-parameter
+
+	isLegal = False
+	while not isLegal:
+		randMono = newProtein.randomMonomer()
+		randBool = randomBool()
+		isLegal = newProtein.twist(randMono, randBool)
+	# Legal twist has now occured on newProtein
+	E1 = protein.E
+	# Update the energy of the copy
+	newProtein.E = newProtein.calculateEnergy()
+	# Update the diameter of the copy
+	newProtein.D = newProtein.calculateDiameter()
+	E2 = newProtein.E
+	r = random.uniform(0, 1)
+
+	if E2 <= E1:
+		return newProtein
+	elif r < np.exp(-B * (E2 - E1)):
+		return newProtein
+	else:
+		return protein
 
 
 # Classes
@@ -122,6 +158,8 @@ class Protein:
 		self.n = length  # Length of protein
 		self.N = length + 2  # Length of grid
 		self.G = Grid(self.N)
+		self.E = 0
+		self.D = length
 		self.G.grid[int(np.round(self.N / 2)), int(np.round(self.N / 2 - self.n / 2)): int(np.round(self.N / 2 - \
 			self.n / 2)) + self.n] = np.linspace(1, self.n, self.n)  # .astype(np.int16)
 		self.midValue = int((length + 1) / 2)
@@ -169,59 +207,16 @@ class Protein:
 					E += weakBinding() * kronDelta(i, j)
 				else:
 					continue
-		# Return E when done.
+		#return energy E
 		return E
-
-	def minimizeEnergy(self,T,dmax,s):
-		"""
-		:param T: Temperature t
-		:param dmax: maximum amount of iterations
-		:param s: d-decending rate
-		:return: protein with probably lowest possible energy (fluctuations is added)
-		"""
-		kb = 1.38e-23  # J/K (Boltzmann's constant)
-		B = 1 / (kb * T) #Boltzmann-parameter
-
-		#Create a copy-protein
-		prot2 = self
-		Ems1 = 0
-
-		# Twist protein d times (d+1 microstates), calculate mean energy
-		for i in range(int(dmax * np.exp(-s * T))):
-
-			# Choose rotation-way and monom-pivot randomly, and random fluctuation
-			rotate = randomBool()
-			pivot = prot2.randomMonomer()
-			r = random.uniform(0, 1)
-
-			# twist the copy-protein
-			twisted = prot2.twist(pivot, rotate)
-
-			#Check if twist was legal
-			if twisted:
-
-				# Calculate energy in copy-protein
-				Ems2 = prot2.calculateEnergy()  # Energy in current microstate
-				# Check if new energy-state is less than previous, update protein if it is (energy-minimization)
-				if Ems2 < Ems1:
-					protein = prot2  # Update protein
-					Ems1 = Ems2  # Update energy of protein
-				# Add thermal fluctuations (see worksheet)
-				elif r < np.exp(-B * (Ems2 - Ems1)):
-					protein = prot2  # Update protein
-					Ems1 = Ems2  # Update energy of protein
-			else:
-				# Try again until twisting is possible
-				continue
-
-		return protein
 
 	def twist(self, x, clockwise):
 		"""
+		This updates the Protein object with a legal twist specified by inputs.
 
 		:param x: int, the number of the pivot monomer
 		:param clockwise: bool, True if the rotation is clockwise
-		:return: bool, True if the rotation is legal. If true, the member grid is changed according to the twist
+		:return: bool, True if the rotation occurred (only if legal)
 		"""
 
 		# Find the coordinates of the pivot monomer
@@ -311,6 +306,8 @@ class Protein:
 
 		# If it was never denied, we now change the grid. Return True to mark the twist was successful
 		self.G.grid = G
+		#self.D = self.calculateDiameter()
+		#self.E = self.calculateEnergy()
 		return True
 
 	def randomMonomer(self):
@@ -320,14 +317,22 @@ class Protein:
 		"""
 		return random.randint(2, self.n - 1)
 
-	def randomTwist(self):
+	def calculateDiameter(self):
+		"""
+		:return: Float; the diameter of the protein, defined as the longest distance between two monomers
 		"""
 
-		:return: None; Performs a successful twist
-		"""
-		isLegal = False
-		while not isLegal:
-			randMono = self.randomMonomer()
-			randBool = randomBool()
-			isLegal = self.twist(randMono, randBool)
+		# Add all non-zero elements as points to an array
+		points = np.zeros([self.n, 2])
+		currentCoords = np.array(self.G.findElement(1))
+		for i in range(self.n):
+			points[i] = currentCoords
+			currentCoords = self.G.searchAdjacent(currentCoords, i + 2)
+
+		# Do some stackoverflow magic
+		D = ssd.pdist(points)
+		D = ssd.squareform(D)
+
+		return np.nanmax(D)
+
 
