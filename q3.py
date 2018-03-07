@@ -1,65 +1,88 @@
 import numpy as np
-import scipy.spatial.distance as ssd
-import matplotlib.pyplot as plt
 import Protein as prot
+import matplotlib.pyplot as plt
 
-# Define constants:
-# s <= 0.01 for sufficiently convergent results for high temperatures
-dmax = 11000
-s = 0.001
-acc = 10
+# Define some things for plotting
+font = {'family': 'normal', 'weight': 'bold', 'size': 16}
+plt.rc('font', **font)
 
-def diameter(protein):
-	"""
+Trange = np.array([10e-12, 1500])  # Range of possible temperatures
+acc = 20
 
-	:param protein: Protein class member; an instance of protein
-	:return: Float; the diameter of the protein, defined as the longest distance between two monomers
-	"""
 
-	# Add all non-zero elements as points to an array
-	points = np.zeros([protein.n, 2])
-	currentCoords = np.array(protein.G.findElement(1))
-	for i in range(protein.n):
-		points[i] = currentCoords
-		currentCoords = protein.G.searchAdjacent(currentCoords, i+2)
+def quest_3_short(acc):
+	# Parameters for protein of length 15
+	dmax = 10000
+	s = 0.002
 
-	# Do some stackoverflow magic
-	D = ssd.pdist(points)
-	D = ssd.squareform(D)
-	N, [I_row, I_col] = np.nanmax(D), np.unravel_index(np.argmax(D), D.shape)
+	# x-axis of plot
+	Tvalues = np.linspace(Trange[0], Trange[1], acc)
+	# y-axis of plot
+	Dvalues = np.zeros(acc)
 
-	return N
+	# For each temperature
+	for i in range(acc):
+		# Find number of twists necessary
+		D = int(dmax * np.exp(-s * Tvalues[i]))
+		diameters = np.zeros(D)
 
-def d(dmax, s, T):
-	"""
+		# Define a new protein for each temperature
+		P = prot.Protein(15)
+		print("\n\nTemperature:", Tvalues[i], "|| # Twists:", D, "|| Iter:", i + 1, "of", acc, "\n\n")
 
-	:param dmax: Float; d at T = 0 (initial value)
-	:param s: Float; Decreasing-rate (choose a staisfactory value, s>0)
-	:param T: Float; Temperature in K
-	:return: Int; The number of necessary iterations d
-	"""
-	return int(dmax * np.exp(-s * T))
+		# Perform twists and find the diameter after each twist
+		for j in range(D):
+			# Perform a single twist with energy and thermal fluctuation conserns
+			P = prot.randomTwist(P, Tvalues[i])
+			# Add to diameter list
+			diameters[j] = P.D
+		# Find the average diameter for the given temperature
+		Dvalues[i] = np.average(diameters)
 
-T = np.array([1, 1500])
-Tvalues = np.linspace(T[0], T[1], acc)
-diametervalues = np.zeros(acc)
+	# Plot
+	plt.plot(Tvalues, Dvalues)
+	plt.xlabel(r"T")
+	plt.ylabel(r"L")
+	plt.show()
 
-# For each temperature
-for i in range(acc):
-	# Find number of twists necessary
-	D = d(dmax, s, Tvalues[i])
-	diameters = np.zeros(D)
-	# Define a new protein for each temperature
-	P = prot.Protein(15)
-	print("\n\nTemperature:" , Tvalues[i], "|| # Twists:" , D, "|| Iter:", i+1, "of" , acc, "\n\n")
-	# Perform twists and find the diameter after each twist
-	for j in range(D):
-		P.randomTwist()
-		diameters[j] = diameter(P)
-		#print(j+1)
-	# Find the average diameter for the given temperature
-	diametervalues[i] = np.average(diameters)
 
-# Plot
-plt.plot(Tvalues, diametervalues)
-plt.show()
+def quest_3_long(acc):
+	# Parameters for protein of length 30
+	dmax = 10000  ### DON'T ACTUALLY KNOW THESE YET
+	s = 0.002
+
+	# x-axis of plot
+	Tvalues = np.linspace(Trange[0], Trange[1], acc)
+	# y-axis of plot
+	Dvalues = np.zeros(acc)
+
+	# For each temperature
+	for i in range(acc):
+		# Find number of twists necessary
+		D = int(dmax * np.exp(-s * Tvalues[i]))
+		diameters = np.zeros(D)
+
+		# Define a new protein for each temperature
+		P = prot.Protein(30)
+		print("\n\nTemperature:", Tvalues[i], "|| # Twists:", D, "|| Iter:", i + 1, "of", acc, "\n\n")
+
+		# Perform twists and find the diameter after each twist
+		for j in range(D):
+			# Perform a single twist with energy and thermal fluctuation conserns
+			P = prot.randomTwist(P, Tvalues[i])
+			# Add to diameter list
+			diameters[j] = P.D
+		# Find the average diameter for the given temperature
+		Dvalues[i] = np.average(diameters)
+
+	# Plot
+	plt.plot(Tvalues, Dvalues)
+	plt.xlabel(r"T")
+	plt.ylabel(r"L")
+	plt.show()
+
+
+# Comment out the ones you don't want to run
+
+quest_3_short(acc)
+#quest_3_long(acc)
