@@ -38,7 +38,7 @@ def quest_4_1(acc,protLength):
 				counter += 1
 			Evalues[i] = P.E
 
-			print("Iter: ", i + 1, "/", acc)
+			print("Iter: ",i + 1,"/",acc)
 
 	# Plot
 	plt.plot(twistValues, Evalues)
@@ -95,7 +95,7 @@ def quest_4_3(acc,protLength):
 		# Add average max-diameter in this temperature to plotting-vector
 		Lvalues[i] = np.average(lengths)
 		# Print current state:
-		print("Iter: ", i + 1, "/", acc, "\tTemp: ", T)
+		print("Iter: ",i + 1, "/", acc, "\tTemp: ",T)
 
 	plt.plot(temp, Lvalues, lw='2', c='g')
 	plt.xlabel(r"Temperature $T$ [K]")
