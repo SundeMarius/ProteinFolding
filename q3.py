@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 # Define some things for plotting
 font = {'family': 'normal', 'weight': 'bold', 'size': 16}
 plt.rc('font', **font)
+plt.rc('text', usetex=True)
+plt.rcParams['text.latex.preamble'] = [r'\boldmath']
 
 Trange = np.array([10e-12, 1500])  # Range of possible temperatures
 acc = 20
@@ -13,7 +15,7 @@ acc = 20
 def quest_3_short(acc):
 	# Parameters for protein of length 15
 	dmax = 10000
-	s = 0.002
+	s = 0.001
 
 	# x-axis of plot
 	Tvalues = np.linspace(Trange[0], Trange[1], acc)
@@ -40,16 +42,18 @@ def quest_3_short(acc):
 		Dvalues[i] = np.average(diameters)
 
 	# Plot
-	plt.plot(Tvalues, Dvalues)
-	plt.xlabel(r"T")
-	plt.ylabel(r"L")
+	plt.plot(Tvalues, Dvalues, lw=3, label=r"15 monomers", color="crimson")
+	plt.xlabel(r"$T$  [K]", size=20)
+	plt.ylabel(r"$\langle L \rangle$  [1]", size=20)
+	plt.legend(loc="best")
+	plt.grid()
 	plt.show()
 
 
 def quest_3_long(acc):
 	# Parameters for protein of length 30
-	dmax = 10000  ### DON'T ACTUALLY KNOW THESE YET
-	s = 0.002
+	dmax = 20000
+	s = 0.001
 
 	# x-axis of plot
 	Tvalues = np.linspace(Trange[0], Trange[1], acc)
@@ -76,11 +80,12 @@ def quest_3_long(acc):
 		Dvalues[i] = np.average(diameters)
 
 	# Plot
-	plt.plot(Tvalues, Dvalues)
-	plt.xlabel(r"T")
-	plt.ylabel(r"L")
+	plt.plot(Tvalues, Dvalues, lw=3, label=r"30 monomers", color="crimson")
+	plt.xlabel(r"$T$  [K]", size=20)
+	plt.ylabel(r"$\langle L \rangle$  [1]", size=20)
+	plt.legend(loc="best")
+	plt.grid()
 	plt.show()
-
 
 # Comment out the ones you don't want to run
 

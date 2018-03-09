@@ -5,11 +5,13 @@ import matplotlib.pyplot as plt
 # Define some things for plotting
 font = {'family': 'normal', 'weight': 'bold', 'size': 16}
 plt.rc('font', **font)
+plt.rc('text', usetex=True)
+plt.rcParams['text.latex.preamble'] = [r'\boldmath']
 
 numTwists = 600  # The number of twists at each temperature
 Tincrement = 30  # The distance between each temperature
 protLength = 15 # Length of protein
-acc = 30  # Must not exceed 30000
+acc = 30000  # Must not exceed 30000
 
 def quest_4_1(acc,protLength):
 	# Define a protein
@@ -41,9 +43,16 @@ def quest_4_1(acc,protLength):
 			print("Iter: ",i + 1,"/",acc)
 
 	# Plot
-	plt.plot(twistValues, Evalues)
-	plt.xlabel(r"Twists")
-	plt.ylabel(r"E")
+	plt.plot(twistValues, Evalues, lw=1, label=r"15 monomers", color="crimson")
+
+	changeTempPoints = np.linspace(0, 30000, int(1500/Tincrement))
+	for point in changeTempPoints:
+		plt.axvline(x=point)
+
+	plt.xlabel(r"\textbf{Twists}", size=20)
+	plt.ylabel(r"$E$  [J]", size=20)
+	plt.legend(loc="best")
+	plt.grid()
 	plt.show()
 
 def quest_4_2(acc,protLength):
@@ -68,9 +77,9 @@ def quest_4_2(acc,protLength):
 		#Print current state:
 		print("Iter: ",i+1,"/",acc, "\tTemp: ",T)
 
-	plt.plot(temp, Evalues, lw='2', c='g')
-	plt.xlabel(r"Temperature $T$ [K]")
-	plt.ylabel(r"Mean energy $\langle E \rangle$  [J]")
+	plt.plot(temp, Evalues, lw=1, label=r"15 monomers", color="crimson")
+	plt.xlabel(r"$T$  [K]", size=20)
+	plt.ylabel(r"$\langle E \rangle$  [J]", size=20)
 	plt.legend(loc="best")
 	plt.grid()
 	plt.show()
@@ -97,9 +106,9 @@ def quest_4_3(acc,protLength):
 		# Print current state:
 		print("Iter: ",i + 1, "/", acc, "\tTemp: ",T)
 
-	plt.plot(temp, Lvalues, lw='2', c='g')
-	plt.xlabel(r"Temperature $T$ [K]")
-	plt.ylabel(r"Mean protein-length $\langle L \rangle$  [1]")
+	plt.plot(temp, Lvalues, lw=1, label=r"15 monomers", color="crimson")
+	plt.xlabel(r"$T$  [K]", size=20)
+	plt.ylabel(r"$\langle L \rangle$  [1]", size=20)
 	plt.legend(loc="best")
 	plt.grid()
 	plt.show()
@@ -125,7 +134,7 @@ def quest_4_4(acc,protLength,numbOfCoolDowns):
 			print("Iter: ", i + 1, "/", acc, "\tTemp: ", T)
 	protein.draw()
 
-#quest_4_1(acc,protLength)
+quest_4_1(acc,protLength)
 #quest_4_2(acc,protLength)
 #quest_4_3(acc,protLength)
 #quest_4_4(acc,protLength,3)
