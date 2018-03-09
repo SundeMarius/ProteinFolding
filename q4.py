@@ -11,8 +11,10 @@ plt.rcParams['text.latex.preamble'] = [r'\boldmath']
 numTwists = 600  # The number of twists at each temperature
 Tincrement = 30  # The distance between each temperature
 protLength = 15 # Length of protein
-acc = 30000  # Must not exceed 30000
-
+acc1 = 30000 # Must not exceed 30000
+acc2 = 2000
+acc3 = 3000
+acc4 = 3000
 def quest_4_1(acc,protLength):
 	# Define a protein
 	P = prot.Protein(protLength)
@@ -43,7 +45,7 @@ def quest_4_1(acc,protLength):
 			print("Iter: ",i + 1,"/",acc)
 
 	# Plot
-	plt.plot(twistValues, Evalues, lw=1, label=r"15 monomers", color="crimson")
+	plt.plot(twistValues, Evalues, lw=0.3, label=r"15 monomers", color="crimson")
 
 	changeTempPoints = np.linspace(0, 30000, int(1500/Tincrement))
 	for point in changeTempPoints:
@@ -77,7 +79,7 @@ def quest_4_2(acc,protLength):
 		#Print current state:
 		print("Iter: ",i+1,"/",acc, "\tTemp: ",T)
 
-	plt.plot(temp, Evalues, lw=1, label=r"15 monomers", color="crimson")
+	plt.plot(temp, Evalues, lw=0.3, label=r"15 monomers", color="crimson")
 	plt.xlabel(r"$T$  [K]", size=20)
 	plt.ylabel(r"$\langle E \rangle$  [J]", size=20)
 	plt.legend(loc="best")
@@ -106,7 +108,7 @@ def quest_4_3(acc,protLength):
 		# Print current state:
 		print("Iter: ",i + 1, "/", acc, "\tTemp: ",T)
 
-	plt.plot(temp, Lvalues, lw=1, label=r"15 monomers", color="crimson")
+	plt.plot(temp, Lvalues, lw=0.3, label=r"15 monomers", color="crimson")
 	plt.xlabel(r"$T$  [K]", size=20)
 	plt.ylabel(r"$\langle L \rangle$  [1]", size=20)
 	plt.legend(loc="best")
@@ -126,7 +128,6 @@ def quest_4_4(acc,protLength,numbOfCoolDowns):
 		for i in range(acc):
 			# perform 600 twists at every temperature, record avg-energy at every temp
 			T = temp[i]
-			lengths = np.zeros(numTwists)
 			for j in range(numTwists):
 				# Twisting
 				protein = prot.randomTwist(protein, T)
@@ -134,7 +135,7 @@ def quest_4_4(acc,protLength,numbOfCoolDowns):
 			print("Iter: ", i + 1, "/", acc, "\tTemp: ", T)
 	protein.draw()
 
-quest_4_1(acc,protLength)
-#quest_4_2(acc,protLength)
-#quest_4_3(acc,protLength)
-#quest_4_4(acc,protLength,3)
+#quest_4_1(acc1,protLength)
+quest_4_2(acc2,protLength)
+#quest_4_3(acc3,protLength)
+#quest_4_4(acc4,protLength,3)

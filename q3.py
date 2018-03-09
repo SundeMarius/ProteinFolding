@@ -14,8 +14,8 @@ acc = 20
 
 def quest_3_short(acc):
 	# Parameters for protein of length 15
-	dmax = 10000
-	s = 0.001
+	dmax = 13000
+	s = 5e-4
 
 	# x-axis of plot
 	Tvalues = np.linspace(Trange[0], Trange[1], acc)
@@ -52,7 +52,7 @@ def quest_3_short(acc):
 
 def quest_3_long(acc):
 	# Parameters for protein of length 30
-	dmax = 20000
+	dmax = 26000
 	s = 0.001
 
 	# x-axis of plot

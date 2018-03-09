@@ -14,8 +14,8 @@ acc = 2  # Number of plotting points
 
 def quest_2_1(acc):
 	# Parameters for protein of length 15
-	dmax = 10000
-	s = 0.001
+	dmax = 13000
+	s = 5e-4
 
 	# x-axis of plot
 	Tvalues = np.linspace(Trange[0], Trange[1], acc)
@@ -103,7 +103,7 @@ def quest_2_2(acc):
 
 def quest_2_5(acc):
 	# Parameters for protein of length 30
-	dmax = 20000
+	dmax = 26000
 	s = 0.001
 
 	# x-axis of plot
