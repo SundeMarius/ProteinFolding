@@ -1,19 +1,21 @@
 import numpy as np
 import Protein as prot
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
 
 # Define some things for plotting
 font = {'family': 'normal', 'weight': 'bold', 'size': 16}
 plt.rc('font', **font)
+plt.rc('text', usetex=True)
+plt.rcParams['text.latex.preamble'] = [r'\boldmath']
 
 Trange = np.array([10e-12, 1500])  # Range of possible temperatures
-acc = 20  # Number of plotting points
+acc = 2  # Number of plotting points
 
 
 def quest_2_1(acc):
 	# Parameters for protein of length 15
 	dmax = 10000
-	s = 0.002
+	s = 0.001
 
 	# x-axis of plot
 	Tvalues = np.linspace(Trange[0], Trange[1], acc)
@@ -38,9 +40,11 @@ def quest_2_1(acc):
 		Evalues[i] = np.average(energies)
 
 	# Plot
-	plt.plot(Tvalues, Evalues)
-	plt.xlabel(r"T")
-	plt.ylabel(r"[E]")
+	plt.plot(Tvalues, Evalues, lw=3, label=r"15 monomers", color="crimson")
+	plt.xlabel(r"$T$  [K]", size=20)
+	plt.ylabel(r"$\langle E \rangle$  [J]", size=20)
+	plt.legend(loc="best")
+	plt.grid()
 	plt.show()
 
 
@@ -67,10 +71,11 @@ def quest_2_2(acc):
 		print("Iter: ", i+1, "/", acc)
 
 	# Plot
-	plt.plot(twistValues, Evalues, label=r"T = 0K")
-	plt.legend()
-	plt.xlabel(r"Twists")
-	plt.ylabel(r"E")
+	plt.plot(twistValues, Evalues, lw=3, label=r"$T$ = 0K", color="crimson")
+	plt.xlabel(r"\textbf{Twists}", size=20)
+	plt.ylabel(r"$E$  [J]", size=20)
+	plt.legend(loc="best")
+	plt.grid()
 	plt.show()
 
 
@@ -88,17 +93,18 @@ def quest_2_2(acc):
 		print("Iter: ", i+1, "/", acc)
 
 	# Plot
-	plt.plot(twistValues, Evalues, label=r"T = 500K")
-	plt.legend()
-	plt.xlabel(r"Twists")
-	plt.ylabel(r"E")
+	plt.plot(twistValues, Evalues, lw=3, label=r"$T$ = 500K", color="crimson")
+	plt.xlabel(r"\textbf{Twists}", size=20)
+	plt.ylabel(r"$E$  [J]", size=20)
+	plt.legend(loc="best")
+	plt.grid()
 	plt.show()
 
 
 def quest_2_5(acc):
 	# Parameters for protein of length 30
-	dmax = 10000	### DON'T KNOW THESE YET
-	s = 0.002
+	dmax = 20000
+	s = 0.001
 
 	# x-axis of plot
 	Tvalues = np.linspace(Trange[0], Trange[1], acc)
@@ -123,14 +129,15 @@ def quest_2_5(acc):
 		Evalues[i] = np.average(energies)
 
 	# Plot
-	plt.plot(Tvalues, Evalues)
-	plt.xlabel(r"T")
-	plt.ylabel(r"[E]")
+	plt.plot(Tvalues, Evalues, lw=3, label=r"30 monomers", color="crimson")
+	plt.xlabel(r"Temperature $T$  [K]", size=20)
+	plt.ylabel(r"Mean energy $\langle E \rangle$  [J]", size=20)
+	plt.grid()
 	plt.show()
 
 
 # Comment out the ones you don't want to run
 
-#quest_2_1(acc)
+quest_2_1(acc)
 #quest_2_2(acc)
-quest_2_5(acc)
+#quest_2_5(acc)

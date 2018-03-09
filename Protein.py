@@ -135,6 +135,13 @@ class Grid:
 
 		:return: None; plots a pretty picture of the grid, suited to the protein
 		"""
+
+		# Define some things for plotting
+		font = {'family': 'normal', 'weight': 'bold', 'size': 16}
+		plt.rc('font', **font)
+		plt.rc('text', usetex=True)
+		plt.rcParams['text.latex.preamble'] = [r'\boldmath']
+
 		colors = ['white', 'crimson']
 		bounds = [0, 1, np.Inf]
 		cmap = col.ListedColormap(colors)
@@ -162,7 +169,7 @@ class Protein:
 		self.D = length
 		self.G.grid[int(np.round(self.N / 2)), int(np.round(self.N / 2 - self.n / 2)): int(np.round(self.N / 2 - \
 			self.n / 2)) + self.n] = np.linspace(1, self.n, self.n)  # .astype(np.int16)
-		self.midValue = int((length + 1) / 2)
+		self.midValue = float((length + 1) / 2)
 
 	def isAboveMiddle(self, x):
 		"""
