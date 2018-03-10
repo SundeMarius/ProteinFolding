@@ -14,7 +14,7 @@ protLength = 15 # Length of protein
 acc1 = 30000 # Must not exceed 30000
 acc2 = 2000
 acc3 = 3000
-acc4 = 3000
+acc4 = 600
 def quest_4_1(acc,protLength):
 	# Define a protein
 	P = prot.Protein(protLength)
@@ -118,13 +118,12 @@ def quest_4_3(acc,protLength):
 def quest_4_4(acc,protLength,numbOfCoolDowns):
 	#Do several cool-downs on a protein, and draw the protein
 
-	# Define protein
-	protein = prot.Protein(protLength)
-
 	# Temperature-range
 	temp = np.linspace(1500, 1e-12, acc)
 
 	for k in range(numbOfCoolDowns):
+		# Define protein
+		protein = prot.Protein(protLength)
 		for i in range(len(temp)):
 			# perform 600 twists at every temperature, record avg-energy at every temp
 			T = temp[i]
@@ -132,10 +131,11 @@ def quest_4_4(acc,protLength,numbOfCoolDowns):
 				# Twisting
 				protein = prot.randomTwist(protein, T)
 			# Print current state:
-			print("Iter: ", i + 1, "/", len(temp), "\tTemp: ", T)
-	protein.draw()
+			print("Status:\t",int((i+1)/len(temp)*100),"%","\nCooldown:",k+1,"\tTemp:",T)
+		protein.present()
+		protein.draw()
 
 #quest_4_1(acc1,protLength)
-quest_4_2(acc2,protLength)
+#quest_4_2(acc2,protLength)
 #quest_4_3(acc3,protLength)
-#quest_4_4(acc4,protLength,3)
+quest_4_4(acc4,protLength,3)
