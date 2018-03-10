@@ -63,9 +63,9 @@ def quest_4_2(acc,protLength):
 
 	#x and y-values to plot (temperature and avg. energy)
 	temp = np.linspace(1500,1e-12,acc)
-	Evalues = np.zeros(len(twistValues))
+	Evalues = np.zeros(len(temp))
 
-	for i in range(len(twistValues)):
+	for i in range(len(temp)):
 		#perform 600 twists at every temperature, record avg-energy at every temp
 		T = temp[i]
 		energy = np.zeros(numTwists)
@@ -77,7 +77,7 @@ def quest_4_2(acc,protLength):
 		#Add average energy in this temperature to plotting-vector
 		Evalues[i] = np.average(energy)
 		#Print current state:
-		print("Iter: ",i+1,"/",len(twistValues), "\tTemp: ",T)
+		print("Iter: ",i+1,"/",len(temp), "\tTemp: ",T)
 
 	plt.plot(temp, Evalues, lw=0.3, label=r"15 monomers", color="crimson")
 	plt.xlabel(r"$T$  [K]", size=20)
@@ -92,9 +92,9 @@ def quest_4_3(acc,protLength):
 
 	# x and y-values to plot (temperature and avg. proteinlength)
 	temp = np.linspace(1500, 1e-12, acc)
-	Lvalues = np.zeros(len(twistValues))
+	Lvalues = np.zeros(len(temp))
 
-	for i in range(len(twistValues)):
+	for i in range(len(temp)):
 		# perform 600 twists at every temperature, record avg-energy at every temp
 		T = temp[i]
 		lengths = np.zeros(numTwists)
@@ -106,7 +106,7 @@ def quest_4_3(acc,protLength):
 		# Add average max-diameter in this temperature to plotting-vector
 		Lvalues[i] = np.average(lengths)
 		# Print current state:
-		print("Iter: ",i + 1, "/", len(twistValues), "\tTemp: ",T)
+		print("Iter: ",i + 1, "/", len(temp), "\tTemp: ",T)
 
 	plt.plot(temp, Lvalues, lw=0.3, label=r"15 monomers", color="crimson")
 	plt.xlabel(r"$T$  [K]", size=20)
@@ -125,14 +125,14 @@ def quest_4_4(acc,protLength,numbOfCoolDowns):
 	temp = np.linspace(1500, 1e-12, acc)
 
 	for k in range(numbOfCoolDowns):
-		for i in range(len(twistValues)):
+		for i in range(len(temp)):
 			# perform 600 twists at every temperature, record avg-energy at every temp
 			T = temp[i]
 			for j in range(numTwists):
 				# Twisting
 				protein = prot.randomTwist(protein, T)
 			# Print current state:
-			print("Iter: ", i + 1, "/", len(twistValues), "\tTemp: ", T)
+			print("Iter: ", i + 1, "/", len(temp), "\tTemp: ", T)
 	protein.draw()
 
 #quest_4_1(acc1,protLength)
