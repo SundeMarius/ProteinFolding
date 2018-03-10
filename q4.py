@@ -11,7 +11,7 @@ plt.rcParams['text.latex.preamble'] = [r'\boldmath']
 numTwists = 600  # The number of twists at each temperature
 Tincrement = 30  # The distance between each temperature
 protLength = 15 # Length of protein
-acc = 30000  # Must not exceed 30000
+acc = 1500  # Must not exceed 30000
 
 def quest_4_1(acc,protLength):
 	# Define a protein
@@ -61,9 +61,9 @@ def quest_4_2(acc,protLength):
 
 	#x and y-values to plot (temperature and avg. energy)
 	temp = np.linspace(1500,1e-12,acc)
-	Evalues = np.zeros(acc)
+	Evalues = np.zeros(len(temp))
 
-	for i in range(acc):
+	for i in range(len(temp)):
 		#perform 600 twists at every temperature, record avg-energy at every temp
 		T = temp[i]
 		energy = np.zeros(numTwists)
@@ -77,8 +77,9 @@ def quest_4_2(acc,protLength):
 		#Print current state:
 		print("Iter: ",i+1,"/",acc, "\tTemp: ",T)
 
-	plt.plot(temp, Evalues, lw=1, label=r"15 monomers", color="crimson")
+	plt.plot(temp, Evalues, lw=0.5, label=r"15 monomers", color="crimson")
 	plt.xlabel(r"$T$  [K]", size=20)
+	plt.xlim(1500,0)
 	plt.ylabel(r"$\langle E \rangle$  [J]", size=20)
 	plt.legend(loc="best")
 	plt.grid()
@@ -90,9 +91,9 @@ def quest_4_3(acc,protLength):
 
 	# x and y-values to plot (temperature and avg. proteinlength)
 	temp = np.linspace(1500, 1e-12, acc)
-	Lvalues = np.zeros(acc)
+	Lvalues = np.zeros(len(temp))
 
-	for i in range(acc):
+	for i in range(len(temp)):
 		# perform 600 twists at every temperature, record avg-energy at every temp
 		T = temp[i]
 		lengths = np.zeros(numTwists)
@@ -104,10 +105,11 @@ def quest_4_3(acc,protLength):
 		# Add average max-diameter in this temperature to plotting-vector
 		Lvalues[i] = np.average(lengths)
 		# Print current state:
-		print("Iter: ",i + 1, "/", acc, "\tTemp: ",T)
+		print("Iter: ",i + 1,"/",acc,"\tTemp: ",T)
 
-	plt.plot(temp, Lvalues, lw=1, label=r"15 monomers", color="crimson")
+	plt.plot(temp, Lvalues, lw=0.6, label=r"%s monomers" %protein.n, color="crimson")
 	plt.xlabel(r"$T$  [K]", size=20)
+	plt.xlim(1500,0)
 	plt.ylabel(r"$\langle L \rangle$  [1]", size=20)
 	plt.legend(loc="best")
 	plt.grid()
@@ -131,10 +133,10 @@ def quest_4_4(acc,protLength,numbOfCoolDowns):
 				# Twisting
 				protein = prot.randomTwist(protein, T)
 			# Print current state:
-			print("Iter: ", i + 1, "/", acc, "\tTemp: ", T)
+			print("Iter: ",i + 1,"/",acc,"\tTemp: ",T)
 	protein.draw()
 
-quest_4_1(acc,protLength)
+#quest_4_1(acc,protLength)
 #quest_4_2(acc,protLength)
-#quest_4_3(acc,protLength)
+quest_4_3(acc,protLength)
 #quest_4_4(acc,protLength,3)
