@@ -125,7 +125,7 @@ def quest_4_4(acc,protLength,numbOfCoolDowns):
 	temp = np.linspace(1500, 1e-12, acc)
 
 	for k in range(numbOfCoolDowns):
-		for i in range(acc):
+		for i in range(len(temp)):
 			# perform 600 twists at every temperature, record avg-energy at every temp
 			T = temp[i]
 			lengths = np.zeros(numTwists)
@@ -133,10 +133,10 @@ def quest_4_4(acc,protLength,numbOfCoolDowns):
 				# Twisting
 				protein = prot.randomTwist(protein, T)
 			# Print current state:
-			print("Iter: ",i + 1,"/",acc,"\tTemp: ",T)
+			print("Iter: ",i + 1,"/",len(temp),"\tTemp: ",T)
 	protein.draw()
 
 #quest_4_1(acc,protLength)
 #quest_4_2(acc,protLength)
-quest_4_3(acc,protLength)
-#quest_4_4(acc,protLength,3)
+#quest_4_3(acc,protLength)
+quest_4_4(acc,protLength,3)
